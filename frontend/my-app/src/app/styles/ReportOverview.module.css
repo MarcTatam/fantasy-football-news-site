@@ -1,0 +1,48 @@
+.container{
+    padding-top: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 10px;
+    display: flex;
+    border-radius: 2.5vw;
+    background-color: white;
+    width: 90%;
+    height: 16vh;
+    align-items: center;
+}
+
+.weekContainer{
+    padding: 10px;
+    width: 60px;
+    height: 60px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    background-color: var(--french-gray);
+}
+
+.headingContainter{
+    padding-left: 2.5vw;
+    padding-right: 2.5vw;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+}
+
+h2.containerHeading{
+    font-size: 28px;
+    text-size-adjust:100%;
+    text-align: left;
+}
+
+p.containerBody{
+    font-size: 12px;
+    line-height: 22px;
+    font-stretch: 100%;
+    text-align: center;
+}
+
+.container:hover{
+    box-shadow: 4px 4px 4px var(--slate-gray);
+}

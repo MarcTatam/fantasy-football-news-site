@@ -12,16 +12,16 @@
 }
 
 h2.headline{
-    font-family: Helvetica;
     font-size: 32px;
     text-size-adjust:100%;
     text-align: left;
+    color: var(--space-cadet);
 }
 
 p.reportBody{
-    font-family: sans-serif;
     font-size: 16px;
     line-height: 22px;
     font-stretch: 100%;
     text-align: left;
+    color: var(--space-cadet);
 }
