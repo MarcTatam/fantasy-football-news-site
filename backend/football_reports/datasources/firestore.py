@@ -36,6 +36,6 @@ class FirestoreClient:
         for item in docs:
             temp = item.get().to_dict()
             temp_report = Report.model_validate(temp)
-            out.append(ReportResponse(headline=temp_report.headline, body=temp_report.body, complete=temp.get("complete"), gw_id=temp.get('id')))
+            out.append(ReportResponse(headline=temp_report.headline, body=temp_report.body, complete=temp.get("complete"), gw_id=item.id))
         return out
         

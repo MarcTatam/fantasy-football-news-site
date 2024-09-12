@@ -8,6 +8,9 @@ from football_reports.models.response import ReportResponse
 from football_reports.models.report import Report
 from football_reports.report_utils import create_report
 from functools import partial
+from dotenv import load_dotenv
+
+load_dotenv()
 
 fpl_client = FPLClient()
 firestore_client = FirestoreClient()
@@ -30,8 +33,8 @@ def pre_flight():
 
 
 @app.get("/")
-def create_report_endpoint(response:Response):
-    response.headers = {"Access-Control-Allow-Origin": "*"}
+def create_report_endpoint(response:Response)->Report:
+    response.headers.update({"Access-Control-Allow-Origin": "*"})
     gw_id, is_complete = fpl_client.get_gameweek()
     if is_complete:
         db_result = firestore_client.get_report_from_db(gw_id)
@@ -42,8 +45,8 @@ def create_report_endpoint(response:Response):
     return generated_report
 
 @app.get("/reports")
-def get_all_reports_endpoint(response:Response):
-    response.headers = {"Access-Control-Allow-Origin": "*"}
+def get_all_reports_endpoint(response:Response)->list[ReportResponse]:
+    response.headers.update({"Access-Control-Allow-Origin": "*"})
     reports = firestore_client.get_all_reports_from_db()
     gw_id, _ = fpl_client.get_gameweek()
     if len(reports) != gw_id:
@@ -59,12 +62,13 @@ def get_all_reports_endpoint(response:Response):
         reports += formatted_missing
     return reports
 
-@app.get("/reports/{gw_id}")
-def get_report_endpoint(gw_id:int, response:Response):
-    response.headers = {"Access-Control-Allow-Origin": "*"}
+@app.get("/report/{gw_id}")
+def get_report_endpoint(gw_id:int, response:Response)->Report:
+    response.headers.update({"Access-Control-Allow-Origin": "*"})
     db_result = firestore_client.get_report_from_db(gw_id)
     if db_result:
-        return db_result.model_dump_json()
+        return db_result
     generated_report = create_report(gw_id, fpl_client, formatter,report_generator)
     firestore_client.add_report_to_db(generated_report, gw_id, False)
+    return generated_report
 
