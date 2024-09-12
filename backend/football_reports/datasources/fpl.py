@@ -3,7 +3,7 @@ class FPLClient:
     def __init__(self):
         self.league_id = 161855
 
-    def get_gameweek(self):
+    def get_gameweek(self)->tuple[int,bool]:
         response = requests.get("https://fantasy.premierleague.com/api/bootstrap-static/")
         response.raise_for_status()
         response_dict = response.json()
@@ -11,7 +11,7 @@ class FPLClient:
             if event["is_current"]:
                 return event["id"], event["finished"]
             
-    def get_teams(self):
+    def get_teams(self)->tuple[list[dict],str]:
         response = requests.get(f"https://fantasy.premierleague.com/api/leagues-classic/{self.league_id}/standings/")
         response.raise_for_status()
         response_dict = response.json()
@@ -29,9 +29,14 @@ class FPLClient:
             teams.append(player_dict)
         return teams, league_name
     
-    def get_player_names(self):
+    def get_player_names(self)->list[dict]:
         response = requests.get(f"https://fantasy.premierleague.com/api/bootstrap-static/")
         response.raise_for_status()
         response_dict = response.json()
         players = response_dict["elements"]
         return players
+    
+    def get_picks(self, team_id:int, gw_id:int)->dict:
+        response = requests.get(f"https://fantasy.premierleague.com/api/entry/{team_id}/event/{gw_id}/picks/")
+        response.raise_for_status()
+        response_dict = response.json()
