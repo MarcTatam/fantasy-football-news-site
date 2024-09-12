@@ -4,7 +4,7 @@ from langchain_openai.chat_models import ChatOpenAI
 from langchain.output_parsers import PydanticOutputParser
 from langchain.prompts import PromptTemplate
 
-class RerportGenerator:
+class ReportGenerator:
     def __init__(self):
         parser = PydanticOutputParser(pydantic_object=Report)
         llm = ChatOpenAI()
