@@ -58,7 +58,7 @@ def get_all_reports_endpoint(response:Response)->list[ReportResponse]:
         missing_reports:list[Report] = asyncio.run(asyncio.gather(*[asyncio.to_thread(partial_create, missing_id) for missing_id in missing]))
         formatted_missing = []
         for i in len(range(missing)):
-            formatted_missing.append(ReportResponse(headline=missing_reports[i].headline, body=missing_reports[i].body,gw_id=missing[i]))
+            formatted_missing.append(ReportResponse(headline=missing_reports[i].headline, body=missing_reports[i].body,gw_id=missing[i], complete=False if missing[i] == gw_id else True))
         reports += formatted_missing
     return reports
 
