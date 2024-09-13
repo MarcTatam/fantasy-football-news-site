@@ -39,7 +39,7 @@ def create_report_endpoint(response:Response)->Report:
     if is_complete:
         db_result = firestore_client.get_report_from_db(gw_id)
     if db_result:
-        return db_result.model_dump_json()
+        return db_result
     generated_report = create_report(gw_id, fpl_client, formatter,report_generator)
     firestore_client.add_report_to_db(generated_report, gw_id, is_complete)
     return generated_report
