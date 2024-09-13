@@ -16,7 +16,7 @@ interface ReportProps {
 }
 
 export default function Report(reportProps:ReportProps) {
-    noStore()
+    noStore();
     const [reportData, setReportData] = useState<ReportData | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);

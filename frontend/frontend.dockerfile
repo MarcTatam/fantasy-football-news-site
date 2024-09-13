@@ -13,6 +13,10 @@ RUN npm install
 # Copy the rest of the application code
 COPY . .
 
+# Set Generator ENV variable
+ARG NEXT_PUBLIC_REPORT_GENERATOR_URL
+ENV NEXT_PUBLIC_REPORT_GENERATOR_URL=$NEXT_PUBLIC_REPORT_GENERATOR_URL
+
 # Build the Next.js application
 RUN npm run build
 
