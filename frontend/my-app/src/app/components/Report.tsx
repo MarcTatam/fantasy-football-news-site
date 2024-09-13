@@ -3,27 +3,33 @@
 import { useState, useEffect } from 'react';
 import styles from "@/styles/Report.module.css"
 
+const apiUrl = process.env.NEXT_PUBLIC_REPORT_GENERATOR_URL;
+
 interface ReportData {
     headline : string;
     body : string;
 }
 
-export default function Report() {
+interface ReportProps {
+  gw_id?:Number;
+}
+
+export default function Report(reportProps:ReportProps) {
     const [reportData, setReportData] = useState<ReportData | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     useEffect(() => {
         const fetchReport = async () => {
           try {
-            const response = await fetch('https://europe-west9-football-value-app.cloudfunctions.net/report-generator-2/');
+            const response = await fetch(reportProps.gw_id ? `${apiUrl}/report/${reportProps.gw_id}`: `${apiUrl}`);
             if (!response.ok) {
-              throw new Error('Failed to fetch users');
+              throw new Error('Failed to fetch report');
             }
             const data = await response.json();
             setReportData(data)
-            setIsLoading(false);
           } catch (err) {
             setError(err instanceof Error ? err.message : 'An error occurred');
+          } finally {
             setIsLoading(false);
           }
         };

@@ -1,6 +1,10 @@
+'use client'
 import Report from "@/components/Report";
-export default function Home() {
+import { useParams } from 'next/navigation'
+
+export default function ReportPage() {
+  const params = useParams<{ id: string; }>()
   return (
-    <Report></Report>
+    <Report gw_id={Number(params.id)}></Report>
   );
 }
