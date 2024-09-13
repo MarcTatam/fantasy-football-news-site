@@ -1,6 +1,7 @@
 'use client'
 import styles from '@/styles/ReportOverviewList.module.css'
 import ReportOverview from './ReportOverview'
+import { unstable_noStore as noStore } from 'next/cache'
 import { useEffect, useState } from 'react';
 
 const apiUrl = process.env.NEXT_PUBLIC_REPORT_GENERATOR_URL;
@@ -15,9 +16,14 @@ async function fetchReports(){
 }
 
 export default function ReportOverviewList(){
+  noStore();
+
   const [reportsData, setReportsData] = useState<Array<any>>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
+  const apiUrl = process.env.NEXT_PUBLIC_REPORT_GENERATOR_URL;
+
   useEffect(() => {
       async function getData() {
         try{

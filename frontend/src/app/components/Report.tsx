@@ -1,9 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react';
+import { unstable_noStore as noStore } from 'next/cache'
 import styles from "@/styles/Report.module.css"
 
-const apiUrl = process.env.NEXT_PUBLIC_REPORT_GENERATOR_URL;
+
 
 interface ReportData {
     headline : string;
@@ -15,9 +16,13 @@ interface ReportProps {
 }
 
 export default function Report(reportProps:ReportProps) {
+    noStore()
     const [reportData, setReportData] = useState<ReportData | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+
+    const apiUrl = process.env.NEXT_PUBLIC_REPORT_GENERATOR_URL;
+
     useEffect(() => {
         const fetchReport = async () => {
           try {
