@@ -10,11 +10,12 @@ class FirestoreClient:
         collection = self.client.collection("reports")
         if collection.document(str(gw_id)).get().exists:
             collection.document(str(gw_id)).update({
-            "headline" : report.headline,
-            "body" : report.body,
-            "complete" : complete
-        }
+                "headline" : report.headline,
+                "body" : report.body,
+                "complete" : complete
+                }
             )
+            return
         collection.add(document_id=str(gw_id), document_data={
             "headline" : report.headline,
             "body" : report.body,
