@@ -38,28 +38,41 @@ def create_report_endpoint(response:Response)->Report:
     gw_id, is_complete = fpl_client.get_gameweek()
     if is_complete:
         db_result = firestore_client.get_report_from_db(gw_id)
-    if db_result:
-        return db_result
+        if db_result:
+            return db_result
     generated_report = create_report(gw_id, fpl_client, formatter,report_generator)
     firestore_client.add_report_to_db(generated_report, gw_id, is_complete)
     return generated_report
 
 @app.get("/reports")
-def get_all_reports_endpoint(response:Response)->list[ReportResponse]:
+async def get_all_reports_endpoint(response: Response) -> list[ReportResponse]:
     response.headers.update({"Access-Control-Allow-Origin": "*"})
     reports = firestore_client.get_all_reports_from_db()
     gw_id, _ = fpl_client.get_gameweek()
+    
     if len(reports) != gw_id:
-        missing = set(range(1,gw_id + 1))
+        missing = set(range(1, gw_id + 1))
         for report in reports:
             missing.remove(report.gw_id)
         missing = list(missing)
-        partial_create = partial(create_report, fpl_client=fpl_client, formatter=formatter,report_generator=report_generator)
-        missing_reports:list[Report] = asyncio.run(asyncio.gather(*[asyncio.to_thread(partial_create, missing_id) for missing_id in missing]))
-        formatted_missing = []
-        for i in len(range(missing)):
-            formatted_missing.append(ReportResponse(headline=missing_reports[i].headline, body=missing_reports[i].body,gw_id=missing[i], complete=False if missing[i] == gw_id else True))
+        
+        partial_create = partial(create_report, fpl_client=fpl_client, formatter=formatter, report_generator=report_generator)
+        
+        # Use asyncio.gather without asyncio.run
+        missing_reports: list[Report] = await asyncio.gather(*[asyncio.to_thread(partial_create, missing_id) for missing_id in missing])
+        
+        formatted_missing = [
+            ReportResponse(
+                headline=missing_reports[i].headline,
+                body=missing_reports[i].body,
+                gw_id=missing[i],
+                complete=False if missing[i] == gw_id else True
+            )
+            for i in range(len(missing))
+        ]
+        
         reports += formatted_missing
+    
     return reports
 
 @app.get("/report/{gw_id}")

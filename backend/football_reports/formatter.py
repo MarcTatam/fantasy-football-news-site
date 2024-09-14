@@ -32,7 +32,7 @@ class ReportFormatter:
                         selected["Name"] = name
                         selected["Points"] = player["event_points"]
 
-    def format_prompt(teams:list[dict], league_name:str, gw_id:int)->str:
+    def format_prompt(self, teams:list[dict], league_name:str, gw_id:int)->str:
         formatted_teams = []
         for team in teams:
             formatted_starters = []

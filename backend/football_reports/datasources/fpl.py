@@ -40,3 +40,4 @@ class FPLClient:
         response = requests.get(f"https://fantasy.premierleague.com/api/entry/{team_id}/event/{gw_id}/picks/")
         response.raise_for_status()
         response_dict = response.json()
+        return response_dict
