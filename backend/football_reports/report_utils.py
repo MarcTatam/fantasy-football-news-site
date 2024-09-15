@@ -1,6 +1,7 @@
 from .models.report import Report
 from .datasources.fpl import FPLClient
-from .formatter import ReportFormatter
+from .datasources.firestore import FirestoreClient
+from .formatter import ReportFormatter, SummaryFormatter
 from .generator import ReportGenerator
 
 def create_report(gw_id:int,fpl_client:FPLClient, formatter:ReportFormatter, report_generator:ReportGenerator)->Report:
@@ -9,3 +10,10 @@ def create_report(gw_id:int,fpl_client:FPLClient, formatter:ReportFormatter, rep
     formatter.format_player_names(teams)
     task_prompt = formatter.format_prompt(teams,league_name,gw_id)
     return report_generator.run(task_prompt)
+
+def create_summary(firestore_client:FirestoreClient, report_generator:ReportGenerator)->Report:
+    reports = firestore_client.get_all_reports_from_db()
+    formatter = SummaryFormatter()
+    task_prompt = formatter.format_prompt(reports)
+    return report_generator.run(task_prompt)
+
