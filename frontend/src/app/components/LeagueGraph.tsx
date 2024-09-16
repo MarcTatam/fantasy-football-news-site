@@ -1,6 +1,7 @@
 'use client'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useState, useEffect } from 'react';
+import styles from '@/styles/Graph.module.css'
 
 const apiUrl = process.env.NEXT_PUBLIC_REPORT_GENERATOR_URL;
 
@@ -38,8 +39,9 @@ function generateLines(fetchedData:Array<TeamData>){
     let colours = ['#484A47', '#5C6D70', '#A37774', '#E88873','#E0AC9D']
     const lines = []
     for (let i = 0; i < fetchedData.length; i++){
-        lines.push(<Line type="monotone" dataKey={fetchedData[i].teamName} stroke={colours[i]}/>)
+        lines.push(<Line type="monotone" dataKey={fetchedData[i].teamName} stroke={colours[i]} key={i.toString()} dot={false}/>)
     }
+    return lines
 }
 
 export default function LeagueGraph(){
@@ -69,23 +71,29 @@ export default function LeagueGraph(){
           fetchTeamHistory();
     },[])
     if (isLoading){
-        return(<div>
+        return(<div className={styles.graphContainer} style={{justifyContent:"center", alignItems:"center", display:'flex'}}>
             Loading...
+        </div>)
+    }
+    if (error){
+        return(<div className={styles.graphContainer}>
+            {error}
         </div>)
     }
     const transformedData = flattenData(TeamsData);
     const lines = generateLines(TeamsData);
     return (
-        <ResponsiveContainer width="80%" height="80%">
-            <LineChart width={730} height={250} data={transformedData}
-                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                {lines}
-            </LineChart>
-        </ResponsiveContainer>
+        <div className={styles.graphContainer}>
+            <ResponsiveContainer height={400}>
+                <LineChart data={transformedData} margin={{ top: 20, right: 40, left: 0, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend margin={{ top: 0, left: 0, right: 0, bottom: 0 }} iconType='plainline'/>
+                    {lines}
+                </LineChart>
+            </ResponsiveContainer>
+        </div>
     )
 }
