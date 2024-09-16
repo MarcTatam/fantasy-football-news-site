@@ -16,13 +16,10 @@ async function fetchReports(){
 }
 
 export default function ReportOverviewList(){
-  noStore();
 
   const [reportsData, setReportsData] = useState<Array<any>>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
-  const apiUrl = process.env.NEXT_PUBLIC_REPORT_GENERATOR_URL;
 
   useEffect(() => {
       async function getData() {

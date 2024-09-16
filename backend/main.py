@@ -6,7 +6,7 @@ from football_reports.formatter import ReportFormatter
 from football_reports.generator import ReportGenerator
 from football_reports.models.response import ReportResponse
 from football_reports.models.report import Report
-from football_reports.report_utils import create_report
+from football_reports.report_utils import create_report, create_summary
 from functools import partial
 from dotenv import load_dotenv
 
@@ -85,3 +85,12 @@ def get_report_endpoint(gw_id:int, response:Response)->Report:
     firestore_client.add_report_to_db(generated_report, gw_id, False)
     return generated_report
 
+@app.get('/summary')
+def get_summary_endpoint(response:Response):
+    response.headers.update({"Access-Control-Allow-Origin": "*"})
+    return create_summary(firestore_client,report_generator)
+
+@app.get('/teams/history')
+def get_team_histories(response:Response):
+    response.headers.update({"Access-Control-Allow-Origin": "*"})
+    return fpl_client.get_teams_history()

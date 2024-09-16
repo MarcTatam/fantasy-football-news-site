@@ -1,0 +1,10 @@
+.graphContainer{
+    border-radius: 2.5vw;
+    background-color: white;
+    width: 90%;
+    margin-left: 5%;
+    margin-top: 10px;
+    padding-bottom: 5px;
+    margin-bottom:20px;
+    min-height: 405px;
+}

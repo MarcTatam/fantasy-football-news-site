@@ -1,5 +1,6 @@
 from .datasources.fpl import FPLClient
 from . import prompts
+from .models import ReportResponse
 
 class ReportFormatter:
     def __init__(self, fpl_client:FPLClient):
@@ -54,3 +55,10 @@ class ReportFormatter:
                                                         bench="\n".join(formatted_bench)
                                                         ))
         return prompts.full_prompt_template.format(league_name=league_name, gameweek=gw_id, teams="\n".join(formatted_teams))
+    
+class SummaryFormatter:
+    def format_prompt(self, reports:list[ReportResponse])->str:
+        stringified_reports = []
+        for report in reports:
+            stringified_reports.append(prompts.report_template.format(gw_id=report.gw_id, headline=report.headline, body=report.body))
+        return prompts.summary_prompt_template.format(reports= "\n".join(stringified_reports))
