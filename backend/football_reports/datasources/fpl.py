@@ -1,4 +1,7 @@
 import requests
+
+from football_reports.models.team import TeamHistory
+
 class FPLClient:
     def __init__(self):
         self.league_id = 161855
@@ -41,3 +44,20 @@ class FPLClient:
         response.raise_for_status()
         response_dict = response.json()
         return response_dict
+
+    def get_team_history(self, team_id:int)->list[int]:
+        response = requests.get(f"https://fantasy.premierleague.com/api/entry/{team_id}/history")
+        response.raise_for_status()
+        response_dict = response.json()
+        out = []
+        for item in response_dict.get("current",[]):
+            out.append(item.get("total_points"))
+        return out
+    
+    def get_teams_history(self)->list[TeamHistory]:
+        teams,_ = self.get_teams()
+        out = []
+        for team in teams:
+            team_history = self.get_team_history(team["ID"])
+            out.append(TeamHistory(team_name=team["Team Name"], points_history=team_history))
+        return out

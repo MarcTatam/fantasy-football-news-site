@@ -89,3 +89,8 @@ def get_report_endpoint(gw_id:int, response:Response)->Report:
 def get_summary_endpoint(response:Response):
     response.headers.update({"Access-Control-Allow-Origin": "*"})
     return create_summary(firestore_client,report_generator)
+
+@app.get('/teams/history')
+def get_team_histories(response:Response):
+    response.headers.update({"Access-Control-Allow-Origin": "*"})
+    return fpl_client.get_teams_history()
