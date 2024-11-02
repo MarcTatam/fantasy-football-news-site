@@ -42,15 +42,15 @@ class ReportFormatter:
             formatted_bench = []
             for player in team["Subs"]:
                 formatted_bench.append(prompts.player_template.format(player_name=player["Name"], player_points=player["Points"]))
-            formatted_teams.append(prompts.team_template.format(team_name=team["Team Name"],
-                                                        team_rank=team["Rank"],
-                                                        team_old_rank=team["Previous Rank"],
-                                                        team_points=team["Points"],
-                                                        team_week_points=team["Week Points"],
-                                                        bench_points=team["Bench Points"],
-                                                        team_manager=team["Manager"],
-                                                        captain=team["Captain"],
-                                                        vice_captain=team["Vice Captain"],
+            formatted_teams.append(prompts.team_template.format(team_name=team.get("Team Name",""),
+                                                        team_rank=team.get("Rank",""),
+                                                        team_old_rank=team.get("Previous Rank",""),
+                                                        team_points=team.get("Points",""),
+                                                        team_week_points=team.get("Week Points",""),
+                                                        bench_points=team.get("Bench Points",""),
+                                                        team_manager=team.get("Manager",""),
+                                                        captain=team.get("Captain",""),
+                                                        vice_captain=team.get("Vice Captain",""),
                                                         starting_11="\n".join(formatted_starters),
                                                         bench="\n".join(formatted_bench)
                                                         ))
