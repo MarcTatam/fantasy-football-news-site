@@ -41,6 +41,17 @@ class FPLClient:
             teams.append(player_dict)
         return teams, league_name
     
+    def update_teams(self, teams:list[dict], gw_id)->None:
+        for team in teams:
+            team_id = team.get("ID")
+            response = requests.get(f"https://fantasy.premierleague.com/api/entry/{team_id}/history/")
+            response.raise_for_status()
+            for item in response.json()["current"]:
+                if item.get("event") == gw_id:
+                    team["Points"] = item.get("total","")
+                    team["Week Points"] = item.get("points","")
+                    team["Bench Points "] = item.get("points_on_bench","")
+    
     def get_player_names(self)->list[dict]:
         response = requests.get(f"https://fantasy.premierleague.com/api/bootstrap-static/")
         response.raise_for_status()

@@ -9,6 +9,7 @@ logger = logging.getLogger("Utils")
 
 def create_report(gw_id:int,fpl_client:FPLClient, formatter:ReportFormatter, report_generator:ReportGenerator)->Report:
     teams, league_name = fpl_client.get_teams()
+    fpl_client.update_teams(teams,gw_id)
     formatter.format_team_players(teams, gw_id)
     formatter.format_player_names(teams)
     validate_teams(teams)
