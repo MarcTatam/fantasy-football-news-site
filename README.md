@@ -88,6 +88,7 @@ cp .env.example frontend/.env.local
 | `GOOGLE_APPLICATION_CREDENTIALS` | backend | Path to a Firestore-enabled service account key. |
 | `NEXT_PUBLIC_REPORT_GENERATOR_URL` | frontend | URL of the running backend (e.g. `http://localhost:8080`). |
 | `FPL_LEAGUE_ID` | backend | FPL league to generate reports for. |
+| `ALLOWED_ORIGINS` | backend | Origins to allow requests from. |
 
 ### 2. Run the backend
 
@@ -127,6 +128,7 @@ Both services are designed for Cloud Run:
 gcloud run deploy fantasy-backend \
   --source backend/ \
   --set-env-vars OPENAI_API_KEY=...
+  --set-env-vars ALLOWED_ORIGINS=https://your-frontend.run.app
 
 # Frontend
 gcloud run deploy fantasy-frontend \
