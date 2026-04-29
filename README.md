@@ -1,11 +1,12 @@
 # Fantasy Football News Site
 
+![Landing page with league standings graph](docs/landing_page.png)
+
 LLM-generated weekly news reports for a Fantasy Premier League mini-league. Pulls live data from the public FPL API, formats it into a structured prompt, and asks an LLM to write a news-style report — complete with a snarky headline, callouts of standout (and abject) performances, and the occasional inside joke.
 
 A standings line graph and a season-summary report round it out.
 
-<TODO: Add image>
-
+![Example weekly report](docs/report.png)
 ## Features
 
 - **Weekly reports** — auto-generated headline + body covering each manager's gameweek, captain choices, and bench decisions.
