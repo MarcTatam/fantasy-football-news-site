@@ -1,5 +1,7 @@
 import asyncio
-from fastapi import FastAPI, Response
+import os
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from football_reports.datasources.fpl import FPLClient
 from football_reports.datasources.firestore import FirestoreClient
 from football_reports.formatter import ReportFormatter
@@ -19,22 +21,22 @@ report_generator = ReportGenerator()
 
 app = FastAPI()
 
-@app.options("/")
-def pre_flight():
-    return Response(
-        status_code=204,
-        headers={
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET",
-            "Access-Control-Allow-Headers": "Content-Type",
-            "Access-Control-Max-Age": "3600",
-        }
-    )
+allowed_origins = os.environ.get(
+    "ALLOWED_ORIGINS",
+    "http://localhost:3000",
+).split(",")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[origin.strip() for origin in allowed_origins],
+    allow_methods=["GET"],
+    allow_headers=["Content-Type"],
+    max_age=3600,
+)
 
 
 @app.get("/")
-def create_report_endpoint(response:Response)->Report:
-    response.headers.update({"Access-Control-Allow-Origin": "*"})
+def create_report_endpoint()->Report:
     gw_id, is_complete = fpl_client.get_current_gameweek()
     if is_complete:
         db_result = firestore_client.get_report_from_db(gw_id)
@@ -45,8 +47,7 @@ def create_report_endpoint(response:Response)->Report:
     return generated_report
 
 @app.get("/reports")
-async def get_all_reports_endpoint(response: Response) -> list[ReportResponse]:
-    response.headers.update({"Access-Control-Allow-Origin": "*"})
+async def get_all_reports_endpoint() -> list[ReportResponse]:
     reports = firestore_client.get_all_reports_from_db()
     gw_id, _ = fpl_client.get_current_gameweek()
     
@@ -76,8 +77,7 @@ async def get_all_reports_endpoint(response: Response) -> list[ReportResponse]:
     return reports
 
 @app.get("/report/{gw_id}")
-def get_report_endpoint(gw_id:int, response:Response)->Report:
-    response.headers.update({"Access-Control-Allow-Origin": "*"})
+def get_report_endpoint(gw_id:int)->Report:
     db_result = firestore_client.get_report_from_db(gw_id)
     if db_result:
         return db_result
@@ -87,11 +87,9 @@ def get_report_endpoint(gw_id:int, response:Response)->Report:
     return generated_report
 
 @app.get('/summary')
-def get_summary_endpoint(response:Response):
-    response.headers.update({"Access-Control-Allow-Origin": "*"})
+def get_summary_endpoint():
     return create_summary(firestore_client,report_generator)
 
 @app.get('/teams/history')
-def get_team_histories(response:Response):
-    response.headers.update({"Access-Control-Allow-Origin": "*"})
+def get_team_histories():
     return fpl_client.get_teams_history()
