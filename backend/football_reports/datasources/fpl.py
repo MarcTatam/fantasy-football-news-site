@@ -13,6 +13,7 @@ class FPLClient:
         for event in response_dict.get("events"):
             if event["is_current"]:
                 return event["id"], event["finished"]
+        return 0, False
             
     def check_gameweek_complete(self,gw_id):
         response = requests.get("https://fantasy.premierleague.com/api/bootstrap-static/")

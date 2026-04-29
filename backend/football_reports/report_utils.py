@@ -34,7 +34,7 @@ def validate_teams(teams:list[dict]):
             logger.warning(f"{team_name} has no points")
         if not team.get("Week Points"):
             logger.warning(f"{team_name} has no week points")
-        if not team.get("Bench Points"):
+        if team.get("Bench Points") is None:
             logger.warning(f"{team_name} has no bench points")
         if not team.get("Manager"):
             logger.warning(f"{team_name} has no manager")

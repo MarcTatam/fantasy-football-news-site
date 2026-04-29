@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
 
 class Report(BaseModel):
-    headline:str = Field("The headline of the report")
-    body:str = Field("The body of the report")
+    headline:str = Field(description="The headline of the report")
+    body:str = Field(description="The body of the report")
