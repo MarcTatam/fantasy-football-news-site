@@ -88,8 +88,6 @@ cp .env.example frontend/.env.local
 | `GOOGLE_APPLICATION_CREDENTIALS` | backend | Path to a Firestore-enabled service account key. |
 | `NEXT_PUBLIC_REPORT_GENERATOR_URL` | frontend | URL of the running backend (e.g. `http://localhost:8080`). |
 
-You'll also need to set your league ID. It's currently hardcoded in `backend/football_reports/datasources/fpl.py` — see the **Known issues** section below.
-
 ### 2. Run the backend
 
 ```bash
@@ -136,10 +134,6 @@ gcloud run deploy fantasy-frontend \
 ```
 
 The frontend Dockerfile takes `NEXT_PUBLIC_REPORT_GENERATOR_URL` as a build arg, so it must be set at build time, not just runtime.
-
-## Known issues / roadmap
-
-- **League ID is hardcoded** in `FPLClient.__init__`. Should be read from an env var.
 
 ## License
 
