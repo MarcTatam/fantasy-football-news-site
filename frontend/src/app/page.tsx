@@ -7,8 +7,8 @@ export default function Home() {
   return (
     <div>
       <LeagueGraph/>
-      <Button linkAdress="/report" text="View the reports!"/>
-      <Button linkAdress="/summary" text="View a season summary report!"/>
+      <Button linkAddress="/report" text="View the reports!"/>
+      <Button linkAddress="/summary" text="View a season summary report!"/>
     </div>
   );
 }
