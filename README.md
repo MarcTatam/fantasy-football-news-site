@@ -7,6 +7,7 @@ LLM-generated weekly news reports for a Fantasy Premier League mini-league. Pull
 A standings line graph and a season-summary report round it out.
 
 ![Example weekly report](docs/report.png)
+
 ## Features
 
 - **Weekly reports** — auto-generated headline + body covering each manager's gameweek, captain choices, and bench decisions.
@@ -139,9 +140,6 @@ The frontend Dockerfile takes `NEXT_PUBLIC_REPORT_GENERATOR_URL` as a build arg,
 ## Known issues / roadmap
 
 - **League ID is hardcoded** in `FPLClient.__init__`. Should be read from an env var.
-- **CORS is set per-endpoint** with `response.headers.update(...)`. Should use `CORSMiddleware`.
-- **Dependencies are pinned to mid-2024 versions** (`fastapi==0.114.0`, `langchain==0.2.14`). Worth a refresh.
-- **`Report` Pydantic model** uses `Field("description")` as a default value rather than `Field(description="...")`, which means the LLM's format instructions are missing real field descriptions.
 
 ## License
 
