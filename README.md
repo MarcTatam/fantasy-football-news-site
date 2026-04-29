@@ -87,6 +87,7 @@ cp .env.example frontend/.env.local
 | `OPENAI_API_KEY` | backend | Used by `langchain-openai` for report generation. |
 | `GOOGLE_APPLICATION_CREDENTIALS` | backend | Path to a Firestore-enabled service account key. |
 | `NEXT_PUBLIC_REPORT_GENERATOR_URL` | frontend | URL of the running backend (e.g. `http://localhost:8080`). |
+| `FPL_LEAGUE_ID` | backend | FPL league to generate reports for. |
 
 ### 2. Run the backend
 
