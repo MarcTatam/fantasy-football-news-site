@@ -1,10 +1,17 @@
+import os
 import requests
+from dotenv import load_dotenv
 
 from football_reports.models.team import TeamHistory
 
+load_dotenv()
+
 class FPLClient:
     def __init__(self):
-        self.league_id = 161855
+        league_id = os.environ.get("FPL_LEAGUE_ID")
+        if not league_id:
+            raise RuntimeError("FPL_LEAGUE_ID environment variable is not set")
+        self.league_id = int(league_id)
 
     def get_current_gameweek(self)->tuple[int,bool]:
         response = requests.get("https://fantasy.premierleague.com/api/bootstrap-static/")
