@@ -7,4 +7,5 @@ requires-python = ">=3.10"
 dependencies = [
     "google-adk[litellm]==2.4.0",
     "litellm==1.91.2",
+    "rapidfuzz>=3.14.5",
 ]
