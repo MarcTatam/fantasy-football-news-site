@@ -3,12 +3,6 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, computed_field, field_validator
 
-class Player(BaseModel):
-    first_name:str
-    second_name:str
-    price:float
-    player_id:int = Field(alias="id")
-
 class Team(BaseModel):
     """A club as it exists in the current season's bootstrap-static payload.
 
@@ -147,3 +141,160 @@ class GameweekResolution(BaseModel):
         if len(self.gameweeks) == 1:
             return f"GW{self.gameweeks[0].id}"
         return f"GW{self.gameweeks[0].id}-{self.gameweeks[-1].id}"
+
+class Player(BaseModel):
+    """One entry from bootstrap-static's `elements` array."""
+
+    model_config = ConfigDict(frozen=True, extra="ignore")
+
+    id: int = Field(description="Season-scoped FPL id. Do not persist.")
+    code: int = Field(description="Cross-season player code. Safe to persist.")
+    first_name: str = ""
+    second_name: str = ""
+    web_name: str
+    team: int = Field(description="Season-scoped team id, matches Team.id.")
+    element_type: int
+    now_cost: int = 0
+    total_points: int = 0
+    minutes: int = 0
+    status: str = "a"
+    selected_by_percent: float = 0.0
+    chance_of_playing_next_round: int | None = None
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def position(self) -> str:
+        return POSITIONS.get(self.element_type, "UNK")
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def full_name(self) -> str:
+        return " ".join(p for p in (self.first_name, self.second_name) if p)
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def price(self) -> float:
+        """now_cost is in tenths of a million."""
+        return self.now_cost / 10
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def available(self) -> bool:
+        return self.status == "a"
+
+    @property
+    def status_text(self) -> str:
+        return STATUS_TEXT.get(self.status, self.status)
+
+    def __str__(self) -> str:
+        return f"{self.web_name} ({self.position}, £{self.price}m)"
+
+
+class PlayerQuery(BaseModel):
+    """Tool input schema for player resolution.
+
+    This model IS the tool contract - its JSON schema is what the agent sees,
+    so the field descriptions are load-bearing prompt text, not comments.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    text: str = Field(
+        description="The player reference exactly as the user wrote it, "
+        "unmodified. Used for matching, logging and clarifying questions.",
+    )
+    expansions: list[str] = Field(
+        default_factory=list,
+        description=(
+            "Full or surname forms you believe `text` refers to, best guess "
+            "first. Fill this whenever `text` is an abbreviation, nickname, "
+            "diminutive or indirect reference that is not the player's actual "
+            "name: 'KDB' -> ['de bruyne'], 'the Egyptian King' -> ['salah'], "
+            "'Trent' -> ['alexander-arnold']. Give several when unsure; they "
+            "are tried in order. Guesses are checked against the current "
+            "squad list, so a wrong or outdated guess returns no match rather "
+            "than the wrong player - it is safe to guess. Leave empty when "
+            "`text` is already a name."
+        ),
+    )
+    team: str | None = Field(
+        default=None,
+        description="Club mentioned or implied by the user, free text "
+        "('Arsenal', 'spurs'). Narrows candidates; ignored if it eliminates "
+        "every match.",
+    )
+    position: Literal["GKP", "DEF", "MID", "FWD"] | None = Field(
+        default=None,
+        description="Position mentioned or implied by the user.",
+    )
+    squad: list[int] = Field(
+        default_factory=list,
+        description="FPL element ids in the user's own team. Pass these "
+        "whenever known: they are the strongest available disambiguator, "
+        "since references like 'my Silva' or 'who replaces X' almost always "
+        "mean a player the user owns.",
+    )
+
+
+class PlayerCandidate(BaseModel):
+    model_config = ConfigDict(frozen=True)
+
+    player: Player
+    score: float = Field(ge=0.0, le=1.0, description="Lexical match strength.")
+    prior: float = Field(
+        default=0.0, ge=0.0, le=1.0,
+        description="Form-based likelihood from minutes and ownership.",
+    )
+    in_squad: bool = Field(
+        default=False, description="Player is in the user's own team."
+    )
+    method: Method = "none"
+
+    #: Squad membership is by far the strongest disambiguator available -
+    #: "who replaces my Silva" is nearly always about the Silva they own - so
+    #: it gets its own weight, large enough to settle a lexical tie on its
+    #: own. The continuous prior is a weaker nudge and needs a wide gap to
+    #: decide anything.
+    SQUAD_WEIGHT: ClassVar[float] = 0.20
+    PRIOR_WEIGHT: ClassVar[float] = 0.08
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def combined(self) -> float:
+        """Lexical score dominates; context only separates near-ties."""
+        return round(
+            self.score
+            + self.SQUAD_WEIGHT * float(self.in_squad)
+            + self.PRIOR_WEIGHT * self.prior,
+            6,
+        )
+
+
+class PlayerResolution(BaseModel):
+    model_config = ConfigDict(frozen=True)
+
+    query: str
+    player: Player | None = None
+    method: Method = "none"
+    candidates: list[PlayerCandidate] = Field(default_factory=list)
+    team_candidates: list[str] = Field(
+        default_factory=list,
+        description="Set when the query named a club that could not be pinned "
+        "down (e.g. 'city'). These are the club names in contention; the "
+        "search was NOT widened to all clubs.",
+    )
+    note: str | None = Field(
+        default=None,
+        description="Declarative explanation of the outcome. Never a question "
+        "- the agent phrases those.",
+    )
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def resolved(self) -> bool:
+        return self.player is not None
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def needs_clarification(self) -> bool:
+        return self.player is None and len(self.candidates) > 1
