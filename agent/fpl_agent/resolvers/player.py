@@ -69,14 +69,6 @@ Method = Literal[
 
 Status = Literal["a", "d", "i", "s", "u", "n"]
 
-STATUS_TEXT: dict[str, str] = {
-    "a": "available",
-    "d": "doubtful",
-    "i": "injured",
-    "s": "suspended",
-    "u": "unavailable",
-    "n": "not in squad",
-}
 
 
 class PlayerResolver:

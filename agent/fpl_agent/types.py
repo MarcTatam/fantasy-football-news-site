@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Literal
+from typing import Literal, ClassVar
 
 from pydantic import BaseModel, ConfigDict, Field, computed_field, field_validator
 
@@ -141,6 +141,18 @@ class GameweekResolution(BaseModel):
         if len(self.gameweeks) == 1:
             return f"GW{self.gameweeks[0].id}"
         return f"GW{self.gameweeks[0].id}-{self.gameweeks[-1].id}"
+
+STATUS_TEXT: dict[str, str] = {
+    "a": "available",
+    "d": "doubtful",
+    "i": "injured",
+    "s": "suspended",
+    "u": "unavailable",
+    "n": "not in squad",
+}
+
+#: FPL element_type -> short position code. Type 5 (managers) appeared in 2024/25.
+POSITIONS: dict[int, str] = {1: "GKP", 2: "DEF", 3: "MID", 4: "FWD", 5: "MNG"}
 
 class Player(BaseModel):
     """One entry from bootstrap-static's `elements` array."""
