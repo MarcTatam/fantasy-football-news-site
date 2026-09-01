@@ -33,10 +33,6 @@ from rapidfuzz import fuzz, process
 from .team import TeamResolver, normalise
 from ..types import Player, PlayerCandidate, PlayerQuery, PlayerResolution
 
-#: FPL element_type -> short position code. Type 5 (managers) appeared in
-#: 2024/25 and is carried here so the payload does not blow up if you keep it.
-POSITIONS: dict[int, str] = {1: "GKP", 2: "DEF", 3: "MID", 4: "FWD", 5: "MNG"}
-
 #: Words that identify a position in free text.
 POSITION_WORDS: dict[str, tuple[str, ...]] = {
     "GKP": ("keeper", "goalkeeper", "gk", "gkp", "goalie", "stopper", "number one"),
@@ -89,10 +85,10 @@ class PlayerResolver:
 
     def __init__(
         self,
-        elements: Iterable[dict[str, Any]],
+        players: list[Player],
         teams: TeamResolver | None = None,
     ) -> None:
-        self.players: list[Player] = [Player.model_validate(e) for e in elements]
+        self.players = players
         self._by_id = {p.id: p for p in self.players}
         self.teams = teams
 
